@@ -4,11 +4,8 @@ import os
 import re
 
 
-def is_watch_group(contact, group_name):
-    if contact.nick == group_name:
-        return True
-    else:
-        return False
+def my_watch_group(contact, group_name):
+    return contact.nick == group_name
 
 
 def dialog_clearify(content):
@@ -20,61 +17,31 @@ def dialog_clearify(content):
     d = content
     if not isinstance(d, type("字符串类型")):
         return ""
-    d = d.replace("  ", " ")
-    # d = d.replace(" ", "")
-    d = d.replace("~~~", "-")
-    d = d.replace("~~", "-")
-    d = d.replace("~", "-")
-    d = d.replace("---", "-")
-    d = d.replace("--", "-")
-    d = d.replace("——", "-")
-    d = d.replace("：", ":")
-    d = d.replace("12层", "12楼")
-    d = d.replace("13层", "13楼")
-    d = d.replace("今日", "今天")
-    d = d.replace("明日", "明天")
-    d = d.replace("合昌", "和昌")
-    d = d.replace("合唱", "和昌")
-    d = d.replace("和唱", "和昌")
-    d = d.replace("点半", ":30")
-    d = d.replace("点30", ":30")
-    d = d.replace("点三十", ":30")
-    d = d.replace("点", ":00")
-    d = d.replace("十一", "11")
-    d = d.replace("十二", "12")
-    d = d.replace("十三", "13")
-    d = d.replace("十四", "14")
-    d = d.replace("十五", "15")
-    d = d.replace("十六", "16")
-    d = d.replace("十七", "17")
-    d = d.replace("十八", "18")
-    d = d.replace("十九", "19")
-    d = d.replace("二十", "20")
-    d = d.replace("十", "10")
-    d = d.replace("九", "9")
-    d = d.replace("八", "8")
-    d = d.replace("七", "7")
-    d = d.replace("六", "6")
-    d = d.replace("五", "5")
-    d = d.replace("四", "4")
-    d = d.replace("三", "3")
-    d = d.replace("二", "2")
-    d = d.replace("一", "1")
-    d = d.replace("下午1:", "13:")
-    d = d.replace("下午2:", "14:")
-    d = d.replace("下午3:", "15:")
-    d = d.replace("下午4:", "16:")
-    d = d.replace("下午5:", "17:")
-    d = d.replace("下午6:", "18:")
-    d = d.replace("下午7:", "19:")
-    d = d.replace("下午8:", "20:")
-    d = d.replace("预订", "预定")
-    d = d.replace("到", "-")
-    d = d.replace("（", "(")
-    d = d.replace("）", ")")
-    d = d.replace("，", ".")
-    d = d.replace(",", ".")
-    d = d.replace("。", ".")
+    clearify_dict = {'~~~': '-', "~~": "-", '  ': ' ',
+                     '~~': '-', '~': '-', '---': '-',
+                     '--': '-', '——': '-', '：': ':',
+                     '全天': '8:30-18:00',
+                     '12层': '12楼', '13层': '13楼',
+                     '今日': '今天', '明日': '明天',
+                     '合昌': '和昌', '合唱': '和昌', '和唱': '和昌',
+                     '点半': ':30', '点30': ':30', '点三十': ':30',
+                     '点': ':00',
+                     '十一': '11', '十二': '12', '十三': '13',
+                     '十四': '14', '十五': '15', '十六': '16',
+                     '十七': '17', '十八': '18', '十九': '19',
+                     '二十': '20', '十': '10',
+                     '九': '9', '八': '8', '七': '7',
+                     '六': '6', '五': '5', '四': '4',
+                     '三': '3', '二': '2', '一': '1',
+                     '下午1:': '13:', '下午2:': '14:', '下午3:': '15:', '下午4:': '16:',
+                     '下午5:': '17:', '下午6:': '18:', '下午7:': '19:', '下午8:': '20:',
+                     '预订': '预定',
+                     '到': '-',
+                     '（': '(', '）': ')',
+                     '，': '.', ',': '.', '。': '.'
+                     }
+    for (k, v) in clearify_dict.items():
+        d = d.replace(k, v)
     return d
 
 
@@ -85,91 +52,12 @@ def is_cmd(dialog):
         return dialog
 
 
-def read_dialog(dialog):
-    book_ornot = -1
-    data_ans = datetime.date.today()
-    meeting_room = ""
-    start_time = ""
-    end_time = ""
-    keyword = {"预定或取消": ["预定", "取消"],
-               "今天或明天": ["今天", "明天", "后天", "号", "日"],  # todo 处理 号 日
-               "上下午": ["上午", "下午"],
-               "开始时间": [":"],
-               "结束时间": [":"],
-               "是否和昌": ["和昌"],
-               "楼层": ["12楼", "13楼"],
-               "会议室": ["小会议室", "大会议室", "会议室"]}
-    start_time_pos = 0
-    for key in keyword:
-        yet = False
-        for value in keyword[key]:
-            # print(value)
-            if yet:
-                break
-            if -1 < dialog.find(value):
-                if "今天或明天" == key:
-                    if "明" == value[0]:
-                        data_ans = data_ans+datetime.timedelta(days=1)
-                    elif "后" == value[0]:
-                        data_ans = data_ans + datetime.timedelta(days=2)
-                    elif "号" == value[0] or "日" == value[0]:
-                        pass
-                    yet = True
-                    continue
-                elif "开始时间" == key:
-                    start_time_pos = dialog.find(value)  # 冒号位置
-                    start_time = dialog[start_time_pos - 2: start_time_pos + 3]
-                    start_time = wash(start_time)
-                    yet = True
-                    continue
-                elif "结束时间" == key:
-                    end_time_pos = dialog.find(value, start_time_pos + 1)
-                    end_time = dialog[end_time_pos - 2: end_time_pos + 3]
-                    end_time = wash(end_time)
-                    yet = True
-                    continue
-                elif "楼层" == key:
-                    meeting_room = value
-                    yet = True
-                    continue
-                elif "会议室" == key:
-                    meeting_room = meeting_room + value
-                    yet = True
-                    continue
-                elif "预定或取消" == key:
-                    book_ornot = (value == "预定").__int__()  # 1 预定
-                    yet = True
-                    continue
-                else:
-                    yet = True
-                    continue
-
-    print("中间信息打印：", "book_ornot=", book_ornot)
-    print("中间信息打印：", "data_ans.__str__()=", data_ans.__str__())
-    print("中间信息打印：", "meeting_room=", meeting_room)
-    print("中间信息打印：", "start_time=", start_time)
-    print("中间信息打印：", "end_time=", end_time)
-    return book_ornot, data_ans.__str__(), meeting_room, start_time, end_time
-
-
 def find_fangjian(dialog):
-    meeting_room = ""
-    keyword = {"楼层": ["12楼", "13楼"],
-               "会议室": ["小会议室", "大会议室", "会议室"]}
-    for key in keyword:
-        yet = False
-        for value in keyword[key]:
-            if yet:
-                break
-            if -1 < dialog.find(value):
-                if "楼层" == key:
-                    meeting_room += value
-                    yet = True
-                    continue
-                elif "会议室" == key:
-                    meeting_room += value
-                    yet = True
-                    continue
+    meeting_room = '十二楼大会议室'  # 默认值是什么额
+    r = re.findall(r'([1][23]楼)[^0-9楼小大会议室]*([大小]?会议室)', dialog)
+    if r.__len__() > 0:
+        if len(r[0]) == 2:
+            meeting_room = r[0][0] + r[0][1]
     return meeting_room
 
 

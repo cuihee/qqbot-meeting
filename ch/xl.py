@@ -6,7 +6,7 @@ excel_file_name = "testMeeting.xlsx"
 
 
 def onQQMessage(bot, contact, member, content):
-    if not is_watch_group(contact=contact, group_name=watch_group_name):
+    if not my_watch_group(contact=contact, group_name=watch_group_name):
         return
     if '[@ME]' in content:
         bot.SendTo(contact, "@"+member+" at命令未启用")
