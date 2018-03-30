@@ -53,11 +53,21 @@ def is_cmd(dialog):
 
 
 def find_fangjian(dialog):
-    meeting_room = '十二楼大会议室'  # 默认值是什么额
-    r = re.findall(r'([1][23]楼)[^0-9楼小大会议室]*([大小]?会议室)', dialog)
-    if r.__len__() > 0:
-        if len(r[0]) == 2:
-            meeting_room = r[0][0] + r[0][1]
+    """
+    用正则表达式从dialog中取出定义好的会议室名称
+    http://www.runoob.com/regexp/regexp-metachar.html
+    正则表达式教程↑
+
+    :param dialog: 传入的字符串
+    :return: 传出会议室名字
+    """
+    meeting_room = '12楼大会议室'
+    r1 = re.findall(r'([1][23]楼)', dialog)
+    r2 = re.findall(r'([大小]?会议室)', dialog)
+    if r1.__len__() > 0:
+        meeting_room = r1[0] + meeting_room[3:]
+    if r2.__len__() > 0:
+        meeting_room = meeting_room[:3] + r2[0]
     return meeting_room
 
 
