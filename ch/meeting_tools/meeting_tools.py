@@ -7,7 +7,7 @@ import re
 def my_watch_group(contact, group_name):
     return contact.nick == group_name
 
-
+# todo 考虑使用redis json存储规则
 def dialog_clearify(content):
     """
     这里面的顺序不要乱
@@ -72,37 +72,17 @@ def find_fangjian(dialog):
 
 
 def find_shijian(dialog):
-    st, et = None, None
-    st_pos = dialog.find(":")  # 冒号位置
-    if st_pos != -1:
-        st = dialog[st_pos - 2: st_pos + 3]
-        st = wash(st)
-    et_pos = dialog.rfind(":")
-    if st_pos != -1:
-        et = dialog[et_pos - 2: et_pos + 3]
-        et = wash(et)
-    if isinstance(type(st), type("字符串")) and isinstance(type(et), type("字符串")):
-        q = int(st[:st.find(":")])
-        w = int(st[st.find(":") + 1:])
-        e = int(et[:et.find(":")])
-        r = int(et[et.find(":") + 1:])
-        if e < q:
-            e += 12
-            et = str(e) + et[et.find(":"):]
-        if 0 < w < 59 and 0 < r < 59:
-            pass
-
-    else:
-        print("时间出错")
+    st = et = None
+    r1 = re.findall(r'([0-9]?[0-9])[:点：]([0-5][0-9])', dialog)
+    if r1.__len__() >= 1:  # 至少有一个时间
+        st = r1[0][0] + ':' + r1[0][1]
+    if r1.__len__() >= 2:  # 有两个时间
+        et = r1[1][0] + ':' + r1[1][1]
     return st, et
 
 
 def find_yuding(dialog):
-    if -1 < dialog.find("取消") < 5:
-        return False
-    else:
-        if -1 < dialog.find("预定") < 5:
-            return True
+    return not (-1 < dialog.find("取消") < 6)
 
 
 def find_riqi(dialog):
@@ -135,38 +115,6 @@ def find_riqi(dialog):
     elif -1 < dialog.find("后"):
         return (datetime.date.today() + datetime.timedelta(days=2)).__str__()
     return datetime.date.today()
-
-
-def wash(strt):
-    """
-    先定位冒号
-    从冒号往左找第一个不是数字的位置
-    从冒号往右找第一个不是数字的位置
-    截取之间的字符串返回
-    :param strt:
-    :return:
-    """
-    liststr = list(strt)
-    safel = 0
-    safer = len(liststr)
-    mh = -1
-    for i in range(safer):
-        if liststr[i] == ":":
-            mh = i
-            break
-    assert mh > safel
-    for i in range(mh-1, safel-1, -1):
-        if ord("0") <= ord(liststr[i]) <= ord("9"):
-            continue
-        safel = i + 1
-        break
-    for i in range(mh+1, safer, 1):
-        if ord("0") <= ord(liststr[i]) <= ord("9"):
-            continue
-        safer = i + int(i == safer)
-        break
-    anstr = ''.join(liststr[safel:safer])
-    return anstr
 
 
 def create_sheet(sheetname, file):
