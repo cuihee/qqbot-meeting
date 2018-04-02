@@ -48,7 +48,7 @@ def dialog_clearify(content):
 
 def is_cmd(dialog):
     if not isinstance(dialog, type("")):
-        return ""
+        return ''
     if dialog.find("预定") > -1 and dialog.find("会议室") > -1:
         return dialog
 
