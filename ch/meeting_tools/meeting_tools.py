@@ -21,7 +21,7 @@ def dialog_clearify(content):
                      '~~': '-', '~': '-', '---': '-',
                      '--': '-', '——': '-', '：': ':',
                      '全天': '8:30-18:00',
-                     '12层': '12楼', '13层': '13楼',
+                     '12楼': '12层', '13楼': '13层',
                      '今日': '今天', '明日': '明天',
                      '合昌': '和昌', '合唱': '和昌', '和唱': '和昌',
                      '点半': ':30', '点30': ':30', '点三十': ':30',
@@ -52,6 +52,10 @@ def is_cmd(dialog):
         return dialog
 
 
+def get_meetingrooms_names():
+    return ['小会议室', '大会议室', '13层会议室']
+
+
 def find_fangjian(dialog):
     """
     用正则表达式从dialog中取出定义好的会议室名称
@@ -61,14 +65,19 @@ def find_fangjian(dialog):
     :param dialog: 传入的字符串
     :return: 传出会议室名字
     """
-    meeting_room = '12楼大会议室'
-    r1 = re.findall(r'([1][23]楼)', dialog)
+    huiyishi = get_meetingrooms_names()
+
+    meeting_room = '12层大会议室'
+    r1 = re.findall(r'([1][23]层)', dialog)
     r2 = re.findall(r'([大小]?会议室)', dialog)
     if r1.__len__() > 0:
         meeting_room = r1[0] + meeting_room[3:]
     if r2.__len__() > 0:
         meeting_room = meeting_room[:3] + r2[0]
-    return meeting_room
+    for i in range(len(huiyishi)):
+        if meeting_room.find(huiyishi[i]) > -1:
+            return i  # 0 1 2
+    return len(huiyishi)  # 3
 
 
 def find_shijian(dialog):
@@ -86,28 +95,29 @@ def find_yuding(dialog):
 
 
 def find_riqi(dialog):
-    findre = re.findall(r'([12]?[0-9]{1,2}[月.][123]?[0-9][日号])', dialog)  # 12月02日
-    if len(findre) > 0:
-        findre2 = findre[0]
-        if findre2.find("月") == 1 or findre2.find(".") == 1:
-            findre2 = "0" + findre2
-        findre2 = findre2.replace("月", "-")
-        findre2 = findre2.replace(".", "-")
-        if findre2.find("日") == 4 or findre2.find("号") == 4:
-            findre2 = findre2[:3] + "0" + findre2[3:]
-        findre2 = findre2.replace("日", "")  # 12-02
-        findre2 = findre2.replace("号", "")  # 12-02
-        findre2 = datetime.date.today().__str__()[:5] + findre2  # 2018-12-02
-        return findre2
-    findre = re.findall(r'([123]?[0-9][日号])', dialog)  # 2号
-    if len(findre) > 0:
-        findre2 = findre[0]
-        if findre2.find("日") == 1:
-            findre2 = "0" + findre2  # 02号
-        findre2 = findre2.replace("日", "")
-        findre2 = findre2.replace("号", "")  # 02
-        findre2 = datetime.date.today().__str__()[:8] + findre2  # 2018-03-02
-        return findre2
+    """
+
+    :param dialog: 4.2
+    :return: 2018-04-02
+    """
+    findre = re.findall(r'([12]?[0-9])[月.]([0-3]?[0-9])[日号]?', dialog)  # 12月02日 10.3
+    if len(findre) == 1:
+        if len(findre[0][0]) == 1:
+            a = '0' + findre[0][0]
+        else:
+            a = findre[0][0]
+        if len(findre[0][1]) == 1:
+            b = '0' + findre[0][1]
+        else:
+            b = findre[0][1]
+        return datetime.date.today().__str__()[:5] + a + '-' + b  # 2018-12-02
+    findre = re.findall(r'([0-3]?[0-9])[日号]', dialog)  # 2号
+    if len(findre) == 1:
+        if len(findre[0]) == 1:
+            a = '0' + findre[0]
+        else:
+            a = findre[0]
+        return datetime.date.today().__str__()[:8] + a  # 2018-12-02
     if -1 < dialog.find("今"):
         return datetime.date.today().__str__()
     elif -1 < dialog.find("明"):
@@ -117,32 +127,12 @@ def find_riqi(dialog):
     return datetime.date.today()
 
 
-def create_sheet(sheetname, file):
-    """
-    根据sheetname创建sheet
-    创建第一行
-    :param sheetname:
-    :return:
-    """
-    if sheetname in file.get_sheet_names():
-        return
-    file.create_sheet(sheetname)
-    sheet = file.get_sheet_by_name(sheetname)
-    sheet.cell(row=1, column=1).value = datetime.date.today().__str__()  # [:8]+"01"
-    writetime(sheet=sheet, startrow=2)
-    ccolumn = 1
-    meeting_roomnames = ["12楼小会议室", "12楼大会议室", "13楼会议室"]
-    for i in meeting_roomnames:
-        ccolumn = ccolumn + 1
-        sheet.cell(row=1, column=ccolumn).value = i
-    return sheet
-
 
 def get_excel_row(sheet, today):
     """
     :param sheet:
     :param today: datetime.date.today().__str__()
-    :return: row of today
+    :return: row of today 只有日期没时间的那一行
     """
     find_ornot = False
     find_row = 0
@@ -152,11 +142,11 @@ def get_excel_row(sheet, today):
             find_row = i
             break
     if find_ornot:
-        writetime(sheet=sheet, startrow=find_row+1)
+        writetime(sheet=sheet, startrow=find_row + 1)
         return find_row
     else:
         find_row = sheet.max_row + 1
-        sheet.cell(row=find_row, column=1).value = datetime.date.today().__str__()
+        sheet.cell(row=find_row, column=1).value = today
         writetime(sheet=sheet, startrow=find_row + 1)
         return find_row
 
@@ -168,28 +158,23 @@ def writetime(sheet, startrow):
     :param startrow:
     :return:
     """
-    # excel_sheet.cell(row=startrow, excel_column=1).value = datetime.date.today().__str__()  # [:8]+"01"
     m = ["00", "15", "30", "45"]
     h = [i.__str__() for i in range(8, 21, 1)]
     crow = startrow
-    for i in h:
-        for j in m:
-            sheet.cell(row=crow, column=1).value = i + ":" + j + ":00"
+    for _h in h:
+        for _m in m:
+            sheet.cell(row=crow, column=1).value = _h + ":" + _m + ":00"
             crow = crow + 1
-
-
-def occupy_it(sheet, st, en, co, info="占用人信息"):
-    for i in range(st, en, 1):
-        _ = sheet.cell(column=co, row=i, value=info)
 
 
 def get_dtime(st, et):
     """
+    todo 感觉可以写成一个函数
     计算所给时间段距离8:00的格子数 默认15min
     请注意8:00是第一个格子
-    :param st:
-    :param et:
-    :return:
+    :param st: 时间 8：00
+    :param et: 时间 9：30
+    :return: 起始时间所在行是当天日期所在行+ds
     """
     a = int(st[:st.find(":")])
     b = int(st[st.find(":") + 1:])
@@ -200,23 +185,14 @@ def get_dtime(st, et):
     return ds, de
 
 
-def get_excel_column(mr):
-    a = -1
-    if mr.find("12楼小会议室") > -1:
-        a = 2
-    elif mr.find("12楼大会议室") > -1:
-        a = 3
-    elif mr.find("13楼会议室") > -1:
-        a = 4
-    return a
-
-
 def get_excel_file(filename):
     """
-    :param filename:
-    :return:
+    :param filename: 文件名带后缀的
+    :return: 打开指定文件名的文件对象
     """
+    # 得到当前系统目录下的文件名列表
     dir_files = os.listdir(os.getcwd())
+    # 当前路径下有filename文件
     if filename in dir_files:
         wb = load_workbook(filename)
     else:
@@ -228,12 +204,48 @@ def get_excel_file(filename):
 
 def get_excel_sheet(riqi, file):
     sheetnames = file.get_sheet_names()  # 所有表名
-    month_name = riqi[:7]
+    month_name = riqi[:7]  # 目标表名
     if month_name in sheetnames:  # 存在
-        sheet = file.get_sheet_by_name(name=month_name)
+        return file.get_sheet_by_name(name=month_name)
     else:
-        sheet = create_sheet(month_name, file)
+        return create_sheet(month_name, file)
+
+
+def create_sheet(sheetname, file):
+    """
+
+    :param sheetname: string
+    :param file: excel文件对象
+    :return: sheet对象
+    """
+    # 如果excel文件中有这个名字的sheet 就直接返回这个sheet对象
+    if sheetname in file.get_sheet_names():
+        return file.get_sheet_by_name(sheetname)
+    # 在excel文件中新建一个名为sheetname的sheet
+    file.create_sheet(sheetname)
+    sheet = file.get_sheet_by_name(sheetname)
+    # 左上角 A1 写入今天的日期
+    sheet.cell(row=1, column=1).value = datetime.date.today().__str__()  # [:8]+"01"
+    # 写时间
+    writetime(sheet=sheet, startrow=2)
+    # 写会议室名字
+    meeting_roomnames = get_meetingrooms_names()
+    for i, n in meeting_roomnames:
+        sheet.cell(row=1, column=i).value = n
     return sheet
+
+
+def deal_book(sheet, start, end, column, info, book, bot, contact):
+    if book:
+        occupied, occupied_info = is_occupied(sheet, start, end, column)
+        if occupied:
+            bot.SendTo(contact, "预定失败\"" + occupied_info + "\"")
+            print("已被\"" + occupied_info + "\"占用")
+        else:
+            occupy_it(sheet, start, end, column, info)
+            print("成功预定")
+    else:  # todo 取消预定
+        pass
 
 
 def is_occupied(sheet, start, end, column):
@@ -247,18 +259,9 @@ def is_occupied(sheet, start, end, column):
     return busy, busy_info
 
 
-def deal_book(sheet, start, end, column, info, book, bot, contact):
-    if book:
-        occupied, occupied_info = is_occupied(sheet, start, end, column)
-        if occupied:
-            bot.SendTo(contact, "预定失败\"" + occupied_info + "\"")
-            print("已被\"" + occupied_info + "\"占用")
-
-        else:
-            occupy_it(sheet, start, end, column, info)
-            print("成功预定")
-    else:  # todo 取消预定
-        pass
+def occupy_it(sheet, st, en, co, info="占用人信息"):
+    for i in range(st, en, 1):
+        sheet.cell(column=co, row=i).value = info
 
 
 def excel_file_close(file, name):

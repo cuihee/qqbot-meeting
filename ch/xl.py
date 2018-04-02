@@ -5,6 +5,7 @@ watch_group_name = "0.0"
 excel_file_name = "testMeeting.xlsx"
 
 
+
 def onQQMessage(bot, contact, member, content):
     if not my_watch_group(contact=contact, group_name=watch_group_name):
         return
@@ -31,7 +32,9 @@ def onQQMessage(bot, contact, member, content):
             print("获取文件", excel_file)
             excel_sheet = get_excel_sheet(riqi=riqi, file=excel_file)
             print("获取sheet", excel_sheet)
-            excel_column = get_excel_column(fangjian)  # todo 没有就新建 找的时候在第一行寻找 异常处理
+            # excel_column = get_excel_column(fangjian)  # todo 没有就新建 找的时候在第一行寻找 异常处理
+            column0 = 2
+            excel_column = fangjian + column0
             print("获取列", excel_column)
             excel_date_row = get_excel_row(sheet=excel_sheet, today=riqi)  # 下一行是8:00:00
             print("获取行", excel_date_row)
