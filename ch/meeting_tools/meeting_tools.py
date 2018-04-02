@@ -51,6 +51,7 @@ def is_cmd(dialog):
         return ''
     if dialog.find("预定") > -1 and dialog.find("会议室") > -1:
         return dialog
+    return ''
 
 
 def get_meetingrooms_names():

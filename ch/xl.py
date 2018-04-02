@@ -13,7 +13,7 @@ def onQQMessage(bot, contact, member, content):
 
     dialog = dialog_clearify(content)
     dialog = is_cmd(dialog)
-    if len(dialog) > 1:
+    if len(dialog) < 1:
         print("不是预定会议室")
     else:
         yuding_info = member.name
