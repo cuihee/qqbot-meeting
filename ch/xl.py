@@ -5,7 +5,6 @@ watch_group_name = "0.0"
 excel_file_name = "testMeeting.xlsx"
 
 
-
 def onQQMessage(bot, contact, member, content):
     if not my_watch_group(contact=contact, group_name=watch_group_name):
         return

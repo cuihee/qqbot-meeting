@@ -7,6 +7,7 @@ import re
 def my_watch_group(contact, group_name):
     return contact.nick == group_name
 
+
 # todo 考虑使用redis json存储规则
 def dialog_clearify(content):
     """
@@ -127,7 +128,6 @@ def find_riqi(dialog):
     return datetime.date.today()
 
 
-
 def get_excel_row(sheet, today):
     """
     :param sheet:
@@ -230,8 +230,11 @@ def create_sheet(sheetname, file):
     writetime(sheet=sheet, startrow=2)
     # 写会议室名字
     meeting_roomnames = get_meetingrooms_names()
-    for i, n in meeting_roomnames:
-        sheet.cell(row=1, column=i).value = n
+    # for (i, n) in meeting_roomnames:
+    #     sheet.cell(row=1, column=i).value = n
+    for i in range(len(meeting_roomnames)):
+        sheet.cell(row=1, column=i+2).value = meeting_roomnames[i]
+
     return sheet
 
 
@@ -244,7 +247,8 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
         else:
             occupy_it(sheet, start, end, column, info)
             print("成功预定")
-    else:  # todo 取消预定
+    else:
+        unoccupy_it(sheet, start, end, column)
         pass
 
 
@@ -262,6 +266,11 @@ def is_occupied(sheet, start, end, column):
 def occupy_it(sheet, st, en, co, info="占用人信息"):
     for i in range(st, en, 1):
         sheet.cell(column=co, row=i).value = info
+
+
+def unoccupy_it(sheet, st, en, co):
+    for i in range(st, en, 1):
+        sheet.cell(column=co, row=i).value = None
 
 
 def excel_file_close(file, name):
