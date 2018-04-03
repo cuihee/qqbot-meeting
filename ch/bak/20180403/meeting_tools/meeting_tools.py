@@ -1,11 +1,3 @@
-"""
-这个文件应该放在全局可以import的位置供xl.py调用
-比如说现在我的D:/anaconda/Lib
-（xl.py按照要求放在了C:/Users/c2534/.qqbot-tmp/plugins）
-
-有时候这个文件会不起作用，手动重启qqbot用命令 qq fresh-restart扫码
-
-"""
 import datetime
 from openpyxl import load_workbook, Workbook
 import os
@@ -13,7 +5,7 @@ import re
 
 
 def my_watch_group(contact, group_name):
-    return contact.nick in group_name
+    return contact.nick == group_name
 
 
 # todo 考虑使用redis json存储规则
@@ -252,6 +244,7 @@ def create_sheet(sheetname, file):
     #     sheet.cell(row=1, column=i).value = n
     for i in range(len(meeting_roomnames)):
         sheet.cell(row=1, column=i+2).value = meeting_roomnames[i]
+
     return sheet
 
 
@@ -259,11 +252,10 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
     if book:
         occupied, occupied_info = is_occupied(sheet, start, end, column)
         if occupied:
-            bot.SendTo(contact, "您预定失败，因为\"" + occupied_info + "\"占用")
-            print("您预定失败，因为\"" + occupied_info + "\"占用")
+            bot.SendTo(contact, "预定失败\"" + occupied_info + "\"")
+            print("已被\"" + occupied_info + "\"占用")
         else:
             occupy_it(sheet, start, end, column, info)
-            bot.SendTo(contact, str(info)+"预定成功")
             print("成功预定")
     else:
         unoccupy_it(sheet, start, end, column)

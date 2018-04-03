@@ -1,7 +1,7 @@
-from meeting_tools import *
+from .meeting_tools import *
 
 
-watch_group_name = ["0.0", '张志琳、刘文、李豪、']
+watch_group_name = "0.0"
 excel_file_name = "testMeeting.xlsx"
 
 
@@ -9,7 +9,7 @@ def onQQMessage(bot, contact, member, content):
     if not my_watch_group(contact=contact, group_name=watch_group_name):
         return
     if '[@ME]' in content:
-        bot.SendTo(contact, " at命令未启用, 但是可以用来测试插件是否启用了")
+        bot.SendTo(contact, "@"+member+" at命令未启用")
 
     dialog = dialog_clearify(content)
     dialog = is_cmd(dialog)
