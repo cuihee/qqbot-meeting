@@ -143,7 +143,7 @@ def find_riqi(dialog):
         return (datetime.date.today() + datetime.timedelta(days=1)).__str__()
     elif -1 < dialog.find("后"):
         return (datetime.date.today() + datetime.timedelta(days=2)).__str__()
-    return datetime.date.today()
+    return datetime.date.today().__str__()
 
 
 def get_excel_row(sheet, today):
@@ -335,6 +335,7 @@ def _test_find_riqi():
     assert find_riqi('预定今天8:30-18:00小会议室') == datetime.date.today().__str__(), '寻找日期函数find_riqi有问题'
     assert find_riqi('预定30日下午12楼小会议室.14:00-16:00') == '2018-04-30', '寻找日期函数find_riqi有问题'
     assert find_riqi('预定27号.下午14:30-17:00.和昌12层大会议室') == '2018-04-27', '寻找日期函数find_riqi有问题'
+    assert find_riqi('预订12楼大会议室，12点到14点')[:7] == datetime.date.today().__str__()[:7], '寻找日期函数find_riqi有问题'
 
 
 if __name__ == '__main__':

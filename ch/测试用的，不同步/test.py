@@ -13,5 +13,10 @@ from ch.meeting_tools import *
 #
 #file.save(excel_file_name)
 
-d = ['123', '231', '312']
-print('123'in d)
+d = '预订12楼大会议室，12点到14点'
+d = dialog_clearify(d)
+d = is_cmd(d)
+print(find_riqi(d))
+print(find_shijian(d)[0])
+print(find_shijian(d)[1])
+print(get_meetingrooms_names()[find_fangjian(d)])

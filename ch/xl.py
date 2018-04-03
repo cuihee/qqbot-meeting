@@ -19,6 +19,7 @@ def onQQMessage(bot, contact, member, content):
         yuding_info = member.name
         book_ornot = find_yuding(dialog)  # True False
         riqi = find_riqi(dialog)  # 2018-03-13
+        print("获取日期:", riqi)
 
         start_time, end_time = find_shijian(dialog)  # 8:00, 9:15
         print("获取时间:", start_time, end_time)
