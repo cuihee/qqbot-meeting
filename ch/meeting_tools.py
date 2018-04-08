@@ -30,6 +30,7 @@ def dialog_clearify(content):
     clearify_dict = {'~~~': '-', "~~": "-", '  ': ' ',
                      '~~': '-', '~': '-', '---': '-',
                      '--': '-', '——': '-', '：': ':',
+                     '～': '-',
                      '全天': '8:30-18:00',
                      '12楼': '12层', '13楼': '13层',
                      '今日': '今天', '明日': '明天',
@@ -65,6 +66,8 @@ def is_cmd(dialog):
     if not isinstance(dialog, type("")):
         return ''
     if dialog.find("预定") > -1 and dialog.find("会议室") > -1:
+        return dialog
+    if dialog.find("订") > -1 and dialog.find("会议室") > -1:
         return dialog
     return ''
 
@@ -103,10 +106,27 @@ def find_shijian(dialog):
     st = et = None
     r1 = re.findall(r'([0-9]?[0-9])[:点：]([0-5][0-9])', dialog)
     if r1.__len__() >= 1:  # 至少有一个时间
-        st = r1[0][0] + ':' + r1[0][1]
+        st = r1[0][0] + ':' + shijian_fenzhong_round(r1[0][1])
     if r1.__len__() >= 2:  # 有两个时间
-        et = r1[1][0] + ':' + r1[1][1]
+        et = r1[1][0] + ':' + shijian_fenzhong_round(r1[1][1])
+    if r1.__len__() <= 0:
+        if dialog.find('上午') > -1:
+            st, et = '8:30', '12:00'
+        if dialog.find('下午') > -1:
+            st, et = '14:00', '18:00'
     return st, et
+
+
+def shijian_fenzhong_round(s):
+    if int(s) < 15:
+        return '00'
+    if int(s) < 30:
+        return '15'
+    if int(s) < 45:
+        return '30'
+    if int(s) < 60:
+        return '45'
+    return '45'
 
 
 def find_yuding(dialog):
@@ -263,10 +283,12 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
             print("您预定失败，因为\"" + occupied_info + "\"占用")
         else:
             occupy_it(sheet, start, end, column, info)
-            bot.SendTo(contact, str(info)+"预定成功")
-            print("成功预定")
+            bot.SendTo(contact, str(info[:info.find(' 群"')])+"预定成功")
+            print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
     else:
         unoccupy_it(sheet, start, end, column)
+        bot.SendTo(contact, str(info[:info.find(' 群"')]) + "取消预定成功")
+        print("取消预定")
         pass
 
 
@@ -328,6 +350,8 @@ def _test_find_shijian():
     assert find_shijian('预定4月2日和昌12层小会议室14:30-18:00') == ('14:30', '18:00'), '寻找开始和结束时间函数find_shijian有问题'
     assert find_shijian('预定28日(今天)下午12层大会议室.15:00-16:00') == ('15:00', '16:00'), '寻找开始和结束时间函数find_shijian有问题'
     assert find_shijian('预定今天8:30-18:00小会议室') == ('8:30', '18:00'), '寻找开始和结束时间函数find_shijian有问题'
+    assert find_shijian('预定上午大会议室') == ('8:30', '12:00'), '寻找开始和结束时间函数find_shijian有问题'
+    assert find_shijian('订小会议室 9:10-10:30') == ('9:10', '10:30'), '寻找开始和结束时间函数find_shijian有问题'
 
 
 def _test_find_riqi():

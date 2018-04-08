@@ -16,7 +16,7 @@ def onQQMessage(bot, contact, member, content):
     if len(dialog) < 1:
         print("不是预定会议室")
     else:
-        yuding_info = member.name
+        yuding_info = member.name + ' 群"' + contact.nick + '" 时间' + datetime.datetime.today().__str__()[:-7]
         book_ornot = find_yuding(dialog)  # True False
         riqi = find_riqi(dialog)  # 2018-03-13
         print("获取日期:", riqi)
