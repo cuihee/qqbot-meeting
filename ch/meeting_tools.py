@@ -12,6 +12,24 @@ import os
 import re
 
 
+def ask_info(file, dates):
+    info = ['还没写这个函数呢 无记录']
+    # todo ask_info
+    # 一个二维标记数组 记录这个位置是否记录过了
+    # 找指定日期的日子，没有月就return '没有当月记录' 没有日就return '没有当日记录'
+    # 看看第一行有几列
+    # 看看这一天有多少行
+    # 扫描这些行列
+    #   不为空就向info里面添加这个格子里的信息
+
+    # todo 新文件可能做更多 偏向这个方案
+    # file文件中记录所有预定会议室的语料 和分析出来的 预定否 日期 会议室 时间 还有不用分析的发言日期时间 发言人 所在群
+    # sheet
+    # 某列
+    # 直接查，匹配dates，就加入info数组
+    return info
+
+
 def my_watch_group(contact, group_name):
     return contact.nick in group_name
 
@@ -277,15 +295,19 @@ def create_sheet(sheetname, file):
 
 def deal_book(sheet, start, end, column, info, book, bot, contact):
     if book:
-        occupied, occupied_info = is_occupied(sheet, start, end, column)
+        # 预定命令
+        occupied, occupied_info = is_occupied(sheet, start, end, column)  # 是否被占用 占用信息
         if occupied:
+            # 如果占用
             bot.SendTo(contact, "您预定失败，因为\"" + occupied_info + "\"占用")
             print("您预定失败，因为\"" + occupied_info + "\"占用")
         else:
+            # 没有占用
             occupy_it(sheet, start, end, column, info)
-            bot.SendTo(contact, str(info[:info.find(' 群"')])+"预定成功")
+            bot.SendTo(contact, "预定成功"+" 相关信息"+info[-32:])
             print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
     else:
+        # 取消预定
         unoccupy_it(sheet, start, end, column)
         bot.SendTo(contact, str(info[:info.find(' 群"')]) + "取消预定成功")
         print("取消预定")
