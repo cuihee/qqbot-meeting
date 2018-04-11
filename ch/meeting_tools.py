@@ -13,7 +13,7 @@ import re
 
 
 def ask_info(file, dates):
-    info = ['还没写这个函数呢 无记录']
+    info = ['还没写这个函数呢 无法记录']
     # todo ask_info
     # 一个二维标记数组 记录这个位置是否记录过了
     # 找指定日期的日子，没有月就return '没有当月记录' 没有日就return '没有当日记录'
@@ -83,15 +83,14 @@ def dialog_clearify(content):
 def is_cmd(dialog):
     if not isinstance(dialog, type("")):
         return ''
-    if dialog.find("预定") > -1 and dialog.find("会议室") > -1:
-        return dialog
-    if dialog.find("订") > -1 and dialog.find("会议室") > -1:
-        return dialog
+    if "会议室" in dialog:
+        if "预" in dialog or "订" in dialog or "定" in dialog:
+            return dialog
     return ''
 
 
 def get_meetingrooms_names():
-    return ['小会议室', '大会议室', '13层会议室']
+    return ['小会议室', '大会议室', '13层会议室', '【会议室名称不详】 请手动添加到代码中并重启机器人']
 
 
 def find_fangjian(dialog):
@@ -148,7 +147,7 @@ def shijian_fenzhong_round(s):
 
 
 def find_yuding(dialog):
-    return not (-1 < dialog.find("取消") < 6)
+    return not ("取消" in dialog)
 
 
 def find_riqi(dialog):
@@ -299,17 +298,17 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
         occupied, occupied_info = is_occupied(sheet, start, end, column)  # 是否被占用 占用信息
         if occupied:
             # 如果占用
-            bot.SendTo(contact, "您预定失败，因为\"" + occupied_info + "\"占用")
+            bot.SendTo(contact, "机器人回复 失败，因为\"" + occupied_info + "\"占用")
             print("您预定失败，因为\"" + occupied_info + "\"占用")
         else:
             # 没有占用
             occupy_it(sheet, start, end, column, info)
-            bot.SendTo(contact, "预定成功"+" 相关信息"+info[-32:])
+            bot.SendTo(contact, "机器人回复 成功"+" 记录"+info[-32:])
             print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
     else:
         # 取消预定
         unoccupy_it(sheet, start, end, column)
-        bot.SendTo(contact, str(info[:info.find(' 群"')]) + "取消预定成功")
+        bot.SendTo(contact, '机器人回复 '+str(info[:info.find(' 群"')]) + "取消成功")
         print("取消预定")
         pass
 

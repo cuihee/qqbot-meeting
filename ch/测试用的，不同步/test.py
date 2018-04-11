@@ -1,13 +1,10 @@
 from ch.meeting_tools import *
 
-yuding_info = 'renmingzi' + ' 群"' + 'qunmingzi' + '" ' + datetime.datetime.today().__str__()[:-7] + ' 预定的'
-print(yuding_info)
-riqi = '2018-04-10'
-yuding_info = yuding_info + riqi + ' '
-start_time = '18:00'
-end_time = '19:15'
-yuding_info = yuding_info + start_time + '-' + end_time + ' '
-fangjian = 0
-yuding_info = yuding_info + fangjian.__str__() + ' ' + get_meetingrooms_names()[fangjian] + ' '
-print(yuding_info)
-print(yuding_info[-32:])
+
+dialog = '预定会议室'
+if dialog.find("会议室") > -1:
+    if dialog.find("预") > -1 or dialog.find("订") > -1 or dialog.find("定") > -1:
+        print(dialog)
+if "会议室" in dialog:
+    if "预" in dialog or "订" in dialog or "定" in dialog > -1:
+        print(dialog)
