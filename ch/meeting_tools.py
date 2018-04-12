@@ -50,7 +50,7 @@ def dialog_clearify(content):
                      '--': '-', '——': '-', '：': ':',
                      '～': '-',
                      '全天': '8:30-18:00',
-                     '12楼': '12层', '13楼': '13层',
+                     '12楼': '12层', '13楼': '13层', '十三楼': '13层', '十二楼': '12层',
                      '今日': '今天', '明日': '明天',
                      '合昌': '和昌', '合唱': '和昌', '和唱': '和昌',
                      '点半': ':30', '点30': ':30', '点三十': ':30',
@@ -62,6 +62,7 @@ def dialog_clearify(content):
                      '九': '9', '八': '8', '七': '7',
                      '六': '6', '五': '5', '四': '4',
                      '三': '3', '二': '2', '一': '1',
+                     # todo 这里替换和第一个re 修改为找到下午或者当前时间超过12点了 那么找时间时小于9就加12
                      '下午1:': '13:', '下午2:': '14:', '下午3:': '15:', '下午4:': '16:',
                      '下午5:': '17:', '下午6:': '18:', '下午7:': '19:', '下午8:': '20:',
                      '预订': '预定',
@@ -71,12 +72,17 @@ def dialog_clearify(content):
                      }
     for (k, v) in clearify_dict.items():
         d = d.replace(k, v)
-    # 5:30-6:00 转换成 17:30-18:00
+
+    # 5:30-6:00 转换成 17:30-18:00 注意15:00-5:00的问题
     r1 = re.findall(r'([^0-9:-]?)([1-7])(:[0-9]{2,3}-)([2-8])(:[0-9]{2,3})', d)
     if len(r1) >= 1:
         d = re.subn(r'([^0-9:-]?)([1-7])(:[0-9]{2,3}-)([2-8])(:[0-9]{2,3})',
                     r1[0][0] + str(int(r1[0][1]) + 12) + r1[0][2] + str(int(r1[0][3]) + 12) + r1[0][4],
                     d)[0]
+
+    r1 = re.findall(r'([^0-9:])([0-9]{1,3})(-[0-9]{1,3}:[0-9]{2,3})', d)
+    if len(r1) >= 1:
+        d = re.subn(r'([^0-9:])([0-9]{1,3})(-[0-9]{1,3}:[0-9]{2,3})', r1[0][0] + r1[0][1] + ':00' + r1[0][2], d)[0]
     return d
 
 
@@ -90,7 +96,7 @@ def is_cmd(dialog):
 
 
 def get_meetingrooms_names():
-    return ['小会议室', '大会议室', '13层会议室', '【会议室名称不详】 请手动添加到代码中并重启机器人']
+    return ['小会议室', '大会议室', '13层会议室', '【会议室名称不详】无法正确记录']
 
 
 def find_fangjian(dialog):
@@ -100,7 +106,7 @@ def find_fangjian(dialog):
     正则表达式教程↑
 
     :param dialog: 传入的字符串
-    :return: 传出会议室名字
+    :return: 传出会议室序号
     """
     huiyishi = get_meetingrooms_names()
 
@@ -116,7 +122,7 @@ def find_fangjian(dialog):
     for i in range(len(huiyishi)):
         if meeting_room.find(huiyishi[i]) > -1:
             return i  # 0 1 2
-    return len(huiyishi)  # 3
+    return len(huiyishi)-1  # 3
 
 
 def find_shijian(dialog):
@@ -299,18 +305,18 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
         if occupied:
             # 如果占用
             bot.SendTo(contact, "机器人回复 失败，因为\"" + occupied_info + "\"占用")
-            print("您预定失败，因为\"" + occupied_info + "\"占用")
+            # print("您预定失败，因为\"" + occupied_info + "\"占用")
         else:
             # 没有占用
             occupy_it(sheet, start, end, column, info)
             bot.SendTo(contact, "机器人回复 成功"+" 记录"+info[-32:])
-            print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
+            # print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
     else:
         # 取消预定
         unoccupy_it(sheet, start, end, column)
         bot.SendTo(contact, '机器人回复 '+str(info[:info.find(' 群"')]) + "取消成功")
-        print("取消预定")
-        pass
+        # print("取消预定")
+    print('\n')
 
 
 def is_occupied(sheet, start, end, column):

@@ -7,4 +7,5 @@ files.txt
 *egg-info/*
 tmp*
 *.log
-ch/test/*
+ch/备份（其实是多余的
+ch/测试用的，不同步

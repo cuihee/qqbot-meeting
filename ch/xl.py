@@ -4,17 +4,20 @@ from meeting_tools import *
 watch_group_name = ["0.0", '张志琳、刘文、李豪、']
 excel_file_name = "testMeeting.xlsx"
 data_file_name = 'data_file.xlsx'
-cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '查询明天会议室预订情况', '/?',  # 0 1 2 3
+cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '查询明天会议室预订情况', 'help',  # 0 1 2 3
             '顺丰的联系方式']
 
 
 def onQQMessage(bot, contact, member, content):
-    if not my_watch_group(contact=contact, group_name=watch_group_name):
-        return
+    # 避免机器人自嗨 机器人发言请注意加上这个字符串
     if '机器人回复' in content:
         return
+    # 监视制定的群
+    if not my_watch_group(contact=contact, group_name=watch_group_name):
+        return
+
     if '[@ME]' in content:
-        bot.SendTo(contact, " at命令测试中, 也可以用来测试插件是否启用了")
+        bot.SendTo(contact, "机器人回复 at命令在开发计划内, 现在可以用来测试插件是否启用了，当前插件启用中")
         if cmd_list[0] in content:
             bot.SendTo(contact, " eepm.sippr.cn ")
         if cmd_list[1] in content:
