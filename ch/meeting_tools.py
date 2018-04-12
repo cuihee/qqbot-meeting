@@ -62,9 +62,7 @@ def dialog_clearify(content):
                      '九': '9', '八': '8', '七': '7',
                      '六': '6', '五': '5', '四': '4',
                      '三': '3', '二': '2', '一': '1',
-                     # todo 这里替换和第一个re 修改为找到下午或者当前时间超过12点了 那么找时间时小于9就加12
-                     '下午1:': '13:', '下午2:': '14:', '下午3:': '15:', '下午4:': '16:',
-                     '下午5:': '17:', '下午6:': '18:', '下午7:': '19:', '下午8:': '20:',
+                     '下午8:': '20:',
                      '预订': '预定',
                      '到': '-',
                      '（': '(', '）': ')',
@@ -72,8 +70,7 @@ def dialog_clearify(content):
                      }
     for (k, v) in clearify_dict.items():
         d = d.replace(k, v)
-
-    # 5:30-6:00 转换成 17:30-18:00 注意15:00-5:00的问题
+    # 5:30-6:00 转换成 17:30-18:00
     r1 = re.findall(r'([^0-9:-]?)([1-7])(:[0-9]{2,3}-)([2-8])(:[0-9]{2,3})', d)
     if len(r1) >= 1:
         d = re.subn(r'([^0-9:-]?)([1-7])(:[0-9]{2,3}-)([2-8])(:[0-9]{2,3})',
@@ -126,17 +123,28 @@ def find_fangjian(dialog):
 
 
 def find_shijian(dialog):
-    st = et = None
+    st = '8:30'
+    et = '18:00'
     r1 = re.findall(r'([0-9]?[0-9])[:点：]([0-5][0-9])', dialog)
     if r1.__len__() >= 1:  # 至少有一个时间
         st = r1[0][0] + ':' + shijian_fenzhong_round(r1[0][1])
     if r1.__len__() >= 2:  # 有两个时间
-        et = r1[1][0] + ':' + shijian_fenzhong_round(r1[1][1])
+        et = shijian_round2(r1[1][0] + ':' + r1[1][1])
     if r1.__len__() <= 0:
         if dialog.find('上午') > -1:
             st, et = '8:30', '12:00'
         if dialog.find('下午') > -1:
             st, et = '14:00', '18:00'
+    # 安全检查是否在早8:00-20:30之间
+    if int(st[:st.find(':')]) < 8:
+        st = '8' + st[st.find(':'):]
+    if int(st[:st.find(':')]) > 20:
+        st = '20' + st[st.find(':'):]
+    if int(et[:et.find(':')]) < 8:
+        et = '8' + et[et.find(':'):]
+    if int(et[:et.find(':')]) > 20:
+        et = '20' + et[et.find(':'):]
+
     return st, et
 
 
@@ -151,6 +159,19 @@ def shijian_fenzhong_round(s):
         return '45'
     return '45'
 
+
+def shijian_round2(s):
+    if int(s[-2:]) > 45:
+        return str(int(s[:s.find(':')])+1) + ':00'
+    if int(s[-2:]) > 30:
+        return s[:s.find(':')] + ':45'
+    if int(s[-2:]) > 15:
+        return s[:s.find(':')] + ':30'
+    if int(s[-2:]) > 0:
+        return s[:s.find(':')] + ':15'
+    if int(s[-2:]) == 0:
+        return s
+    return s
 
 def find_yuding(dialog):
     return not ("取消" in dialog)

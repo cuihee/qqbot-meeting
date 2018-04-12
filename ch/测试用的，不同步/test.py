@@ -1,10 +1,13 @@
 from ch.meeting_tools import *
 
 
-dialog = '预定会议室'
-if dialog.find("会议室") > -1:
-    if dialog.find("预") > -1 or dialog.find("订") > -1 or dialog.find("定") > -1:
-        print(dialog)
-if "会议室" in dialog:
-    if "预" in dialog or "订" in dialog or "定" in dialog > -1:
-        print(dialog)
+dialog = '预约29号下午四点半和昌13楼会议室'
+d = dialog_clearify(dialog)
+print(d)
+print(find_yuding(d))
+print(find_riqi(d))
+print(find_shijian(d))
+print(find_fangjian(d))
+print(get_meetingrooms_names()[find_fangjian(d)])
+#？？？忽略了呀，怎么会上传
+
