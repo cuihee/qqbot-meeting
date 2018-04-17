@@ -13,20 +13,33 @@ import re
 
 
 def ask_info(file, dates):
-    info = ['还没写这个函数呢 无法记录']
-    # todo ask_info
-    # 一个二维标记数组 记录这个位置是否记录过了
-    # 找指定日期的日子，没有月就return '没有当月记录' 没有日就return '没有当日记录'
-    # 看看第一行有几列
-    # 看看这一天有多少行
-    # 扫描这些行列
-    #   不为空就向info里面添加这个格子里的信息
+    info = ['无记录']
+    # 打开这个文件
+    f = get_excel_file(file)
+    # 用dates[:7]找sheet
+    fsheet = get_excel_sheet(dates, f)
+    # 用dates找row
+    frow = -1
+    for i in range(1, fsheet.max_row+1):
+        if fsheet.cell(row=i, column=1).value == dates:
+            frow = i
+            break
+    if frow == -1:
+        return info
+    # 默认deltarow为
+    deltafrow = 52  # 8:00-20:45=12*4+4=52
+    for i in range(2, fsheet.max_column+1):  # 列
+        for j in range(1+frow, deltafrow+1+frow):  # 行
+            if fsheet.cell(row=j, column=i).value is None:
+                continue
+            if fsheet.cell(row=j, column=i).value not in info:
+                info.append(str(fsheet.cell(row=j, column=i).value))
 
-    # todo 新文件可能做更多 偏向这个方案
-    # file文件中记录所有预定会议室的语料 和分析出来的 预定否 日期 会议室 时间 还有不用分析的发言日期时间 发言人 所在群
-    # sheet
-    # 某列
-    # 直接查，匹配dates，就加入info数组
+    # 关闭文件
+    f.close()
+
+    if len(info) > 1:
+        info[:] = info[1:]  # 删除第一个元素
     return info
 
 
@@ -172,6 +185,7 @@ def shijian_round2(s):
     if int(s[-2:]) == 0:
         return s
     return s
+
 
 def find_yuding(dialog):
     return not ("取消" in dialog)
@@ -319,7 +333,7 @@ def create_sheet(sheetname, file):
     return sheet
 
 
-def deal_book(sheet, start, end, column, info, book, bot, contact):
+def deal_book(sheet, start, end, column, info, book, bot, contact, member):
     if book:
         # 预定命令
         occupied, occupied_info = is_occupied(sheet, start, end, column)  # 是否被占用 占用信息
@@ -330,7 +344,7 @@ def deal_book(sheet, start, end, column, info, book, bot, contact):
         else:
             # 没有占用
             occupy_it(sheet, start, end, column, info)
-            bot.SendTo(contact, "机器人回复 成功"+" 记录"+info[-32:])
+            bot.SendTo(contact, "机器人回复 成功\n"+" 记录的信息： "+member.name+" "+info[-32:])
             # print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
     else:
         # 取消预定
@@ -399,7 +413,7 @@ def _test_find_shijian():
     assert find_shijian('预定28日(今天)下午12层大会议室.15:00-16:00') == ('15:00', '16:00'), '寻找开始和结束时间函数find_shijian有问题'
     assert find_shijian('预定今天8:30-18:00小会议室') == ('8:30', '18:00'), '寻找开始和结束时间函数find_shijian有问题'
     assert find_shijian('预定上午大会议室') == ('8:30', '12:00'), '寻找开始和结束时间函数find_shijian有问题'
-    assert find_shijian('订小会议室 9:10-10:30') == ('9:10', '10:30'), '寻找开始和结束时间函数find_shijian有问题'
+    assert find_shijian('订小会议室 9:10-10:30') == ('9:00', '10:30'), '寻找开始和结束时间函数find_shijian有问题'
 
 
 def _test_find_riqi():

@@ -13,7 +13,7 @@ class g(object):
     pass
 
 def onPlug(bot):
-    g.t = bot.conf.pluginsConf.get(__name__, '8:00')
+    g.t = bot.conf.pluginsConf.get(__name__, '18:00')
     g.hour, g.minute = g.t.split(':')
     
     @qqbotsched(hour=g.hour, minute=g.minute)
