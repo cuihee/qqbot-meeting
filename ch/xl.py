@@ -4,7 +4,7 @@ from meeting_tools import *
 watch_group_name = ["0.0", 'SIPPR 智能与信息12楼', '智能与信息工程中心']
 excel_file_name = "testMeeting.xlsx"  # 新建的sheet第一天不太对，但是不影响使用
 cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '查询明天会议室预订情况', 'help',  # 0 1 2 3
-            '顺丰的联系方式', 'stop']
+            '顺丰的联系方式', 'stop', 'watch_group_name']
 
 
 def onQQMessage(bot, contact, member, content):
@@ -38,6 +38,9 @@ def onQQMessage(bot, contact, member, content):
         return
     if '[@ME]' in content[:5]:
         bot.SendTo(contact, "机器人回复 只要你at我，我就回复这一句\n用来查看插件是否启用中")
+        return
+    if cmd_list[6] in content:
+        bot.SendTo(contact, "机器人回复 "+watch_group_name.__str__())
         return
 
     dialog = dialog_clearify(content)
