@@ -9,7 +9,7 @@ cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '�
 
 def onQQMessage(bot, contact, member, content):
     # 避免机器人自嗨 机器人发言请注意加上这个字符串
-    if '机器人回复' in content:  # todo 回复时候用函数管理，然后这里也可以用函数判断
+    if '机器人回复' in content:
         return
     # 监视制定的群
     if not my_watch_group(contact=contact, group_name=watch_group_name):

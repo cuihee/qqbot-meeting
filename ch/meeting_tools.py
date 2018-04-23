@@ -1,10 +1,10 @@
 """
 这个文件应该放在全局可以import的位置供xl.py调用
 比如说现在我的D:/anaconda/Lib
+
 （xl.py按照要求放在了C:/Users/c2534/.qqbot-tmp/plugins）
 
-有时候这个文件会不起作用，手动重启qqbot用命令 qq fresh-restart扫码
-
+有时候(脚本运行后修改这个文件)这个文件会不起作用，手动重启qqbot用命令 qq fresh-restart扫码
 """
 import datetime
 from openpyxl import load_workbook, Workbook
@@ -345,7 +345,7 @@ def deal_book(sheet, start, end, column, info, book, bot, contact, member):
             # 没有占用
             occupy_it(sheet, start, end, column, info)
             bot.SendTo(contact, "机器人回复 成功\n"+" 记录的信息： "+member.name+" "+info[-32:])
-            # print("成功预定")  # todo 谁 预定成功了 日期 时间 房间
+            # print("成功预定")
     else:
         # 取消预定
         unoccupy_it(sheet, start, end, column)
