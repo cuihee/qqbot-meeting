@@ -17,7 +17,16 @@ watch_group_name = ['创客学院管理员社群',
                     ]
 ans_dic = {
     '创客学院官网': 'http://www.makeru.com.cn/ ',
-    'VR教程': 'http://www.makeru.com.cn/roadmap/vr ',
+    'VR教程': '先学c#和unity3d引擎 http://www.makeru.com.cn/roadmap/vr \n '
+            '再学用unity3d的两个插件 \n'
+            'https://assetstore.unity.com/packages/templates/systems/steamvr-plugin-32647 \n '
+            'https://assetstore.unity.com/packages/tools/integration/vive-input-utility-64219 ',
+    'AR教程': '高通vuforia https://developer.vuforia.com/downloads/sdk \n '
+            '亮风台HiAR http://www.hiar.com.cn/doc-v1/main/home/ \n '
+            'EasyAR https://www.easyar.cn/view/download.html \n '
+            '苹果ARkit https://developer.apple.com/cn/arkit/ \n '
+            '谷歌ARcore https://developer.apple.com/cn/arkit/ \n '
+            '选一个吧',
     'web教程': 'http://www.makeru.com.cn/roadmap/web ',
     '嵌入式教程': 'http://www.makeru.com.cn/roadmap/emb ',
     'stm32教程': 'http://www.makeru.com.cn/search?q=stm32 ',

@@ -2,9 +2,11 @@ from meeting_tools import *
 
 
 watch_group_name = ["0.0", 'SIPPR 智能与信息12楼', '智能与信息工程中心']
+watch_buddy_name = ['崔鹤', '乔辉', '游冰']
 excel_file_name = "testMeeting.xlsx"  # 新建的sheet第一天不太对，但是不影响使用
 cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '查询明天会议室预订情况', 'help',  # 0 1 2 3
             '顺丰的联系方式', 'stop', 'watch_group_name']
+# 要么直接全部命令都要有@我？？？
 
 
 def onQQMessage(bot, contact, member, content):
