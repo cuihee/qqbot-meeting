@@ -15,4 +15,8 @@ def onQQMessage(bot, contact, member, content):
     if '[@ME]' in content:
         if 'start' in content:
             bot.Plug('xl')
-            bot.SendTo(contact, '机器人回复 插件启动')
+            s = bot.Plugins()
+            if 'xl' in s:
+                bot.SendTo(contact, '机器人回复 插件启动成功')
+            else:
+                bot.SendTo(contact, '机器人回复 插件启动失败')

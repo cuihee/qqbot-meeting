@@ -6,7 +6,16 @@ watch_buddy_name = ['崔鹤', '乔辉', '游冰']
 excel_file_name = "testMeeting.xlsx"  # 新建的sheet第一天不太对，但是不影响使用
 cmd_list = ['效率助手下载地址', '查询今天会议室预订情况', '查询明天会议室预订情况', 'help',  # 0 1 2 3
             '顺丰的联系方式', 'stop', 'watch_group_name']
-# 要么直接全部命令都要有@我？？？
+# 关键词和触发的行为
+cmd_dic = {
+    '效率助手下载地址': '',
+    '查询今天会议室预订情况': '',
+    '查询明天会议室预订情况': '',
+    'help': '',
+    '顺丰的联系方式': '',
+    'stop': '',
+    'watch_group_name': ''
+}
 
 
 def onQQMessage(bot, contact, member, content):
@@ -16,16 +25,26 @@ def onQQMessage(bot, contact, member, content):
     # 监视制定的群
     if not my_watch_group(contact=contact, group_name=watch_group_name):
         return
+    # todo 用dic替换list
+    for k, v in cmd_dic.items():
+        if k in content:
+            if isinstance(cmd_dic[k], type(func())):
+                # 是函数 就执行函数
+                pass
+            else:
+                # 不是函数 直接输出
+                pass
+            # return
     if cmd_list[0] in content:
         bot.SendTo(contact, "机器人回复 eepm.sippr.cn ")
         return
     if cmd_list[1] in content:
         report_info = ask_info(excel_file_name, (datetime.date.today() + datetime.timedelta(days=0)).__str__())
-        bot.SendTo(contact, '机器人回复 '+'\n'.join(report_info))
+        bot.SendTo(contact, '机器人回复 \n'+'\n'.join(report_info))
         return  # 避免对查询语句进行预定会议室
     if cmd_list[2] in content:
         report_info = ask_info(excel_file_name, (datetime.date.today()+datetime.timedelta(days=1)).__str__())
-        bot.SendTo(contact, '机器人回复 '+'\n'.join(report_info))
+        bot.SendTo(contact, '机器人回复 \n'+'\n'.join(report_info))
         return  # 避免对查询语句进行预定会议室
     if '[@ME]' in content and cmd_list[3] in content:
         bot.SendTo(contact, '机器人回复 下列引号内的命令采用精确匹配。' + cmd_list.__str__())
@@ -102,4 +121,13 @@ def onQQMessage(bot, contact, member, content):
 
 
 def onPlug(bot):
-    bot.Plug('xl_sitter')
+    s = bot.Plugins()
+    if 'xl_sitter' in s:
+        pass
+    else:
+        bot.Plug('xl_sitter')
+
+
+def func():
+    pass
+

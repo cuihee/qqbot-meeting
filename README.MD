@@ -1,14 +1,16 @@
 ﻿本项目是基于qqbot[https://github.com/pandolia/qqbot]写的一个插件
+（我写的脚本都在ch文件夹里面，ch文件夹都是我写的，其余文件都是qqbot项目的）
 
 本项目和qqbot都是使用python实现（我用的是anaconda版 python3.6.3）
 
-本项目的github地址：待传
+本项目的github地址：https://github.com/cuihee/qqbot-meeting 
 
 本项目实现的功能：
 在qqbot基础上，
-维护一个excel表格，使之可以实现预定会议室，
-取消预定会议室，
-查看预订情况。
+维护一个excel表格，使之可以实现
+·预定会议室，
+·取消预定会议室，
+·查看预订情况。
 
 #安装步骤与使用方法
 1 安装anaconda（python3.6）版本

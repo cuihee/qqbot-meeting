@@ -12,6 +12,15 @@ import os
 import re
 
 
+# todo 规范一下好
+def botreply(bot, contact, member, s):
+    # if '机器人回复' 开头:
+    #   return
+    # 判断contact还是member
+    # bot.SendTo(contact, "机器人回复 \n"+s)
+    pass
+
+
 def ask_info(file, dates):
     info = ['无记录']
     # 打开这个文件

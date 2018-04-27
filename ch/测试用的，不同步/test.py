@@ -1,20 +1,25 @@
-from ch.meeting_tools import *
 
 
-ans_dic = {
-    '创客学院官网': 'http://www.makeru.com.cn/ ',
-    'VR教程': 'http://www.makeru.com.cn/roadmap/vr ',
-    'web教程': 'http://www.makeru.com.cn/roadmap/web ',
-    '嵌入式教程': 'http://www.makeru.com.cn/roadmap/emb ',
-    '物联网教程': 'http://www.makeru.com.cn/roadmap/iot ',
-    'java教程': 'http://www.makeru.com.cn/roadmap/javaee ',
-    'AR教程': 'http://www.makeru.com.cn/roadmap/vr ',
-    '安卓教程': 'http://www.makeru.com.cn/roadmap/android ',
-    '免费课程': 'http://www.makeru.com.cn/course/library?isPay=0 ',
-    '直播课': 'http://www.makeru.com.cn/live/library ',
+def test(n=1):
+    for i in range(n):
+        print('test', end='')
 
+
+dic = {
+    '1': 'string',
+    '2': 123,
+    '3': [1, 2, 3],
+    '4': test,
 }
 
-s = ' '.join(ans_dic.keys())
+k = '4'
 
-print(s)
+if isinstance(dic[k], type(test)):
+    dic[k](3)
+else:
+    print(dic[k])
+
+
+
+for k, v in dic.items():
+    print(k, v)
